@@ -21,11 +21,87 @@ SD_CardInfo SDCardInfo;
 
 
 
-/*******************************************************************/
-int main()
-{
-	SD_Error SD_ErrorState = SD_OK;	// SD SDIO error status
 
+
+
+
+FRESULT SD_CardMount(void){
+	FRESULT res;
+	FATFS fs;
+    res = f_mount(&fs, "/", 1);
+    
+	if(res != FR_OK) {
+        printf("---- f_mount() failed, res = %d\r\n", res);
+        return FR_INT_ERR;
+    }
+    printf("++++ f_mount() done!\r\n");
+	return FR_OK;
+}
+
+
+
+
+
+FRESULT SD_CardFileOpen(void){
+	
+	const unsigned char fname[12] = "fstest00.txt";
+	uint8_t readed_data[128];
+	unsigned int BytesReaded = 0;
+
+
+	printf("---- opening TXT-file %s... \n ", fname);
+	
+	FIL file;
+    FRESULT res = f_open(&file, fname, FA_READ);
+    if(res != FR_OK) {
+		printf("--- Error opening file. ErrorCode res = %d \n", res);
+    }
+	else{ 
+		printf("+++ opening file complete sucessfully. ErrorCode res = %d \n", res);
+		
+		printf("--- Starting file reading... \n");
+		res = f_read(&file, readed_data, sizeof(readed_data), &BytesReaded);
+		if(res != FR_OK){
+			printf("---- reading file FAILED! ErrorCode = %d \n", res);
+			f_close(&file);
+			return res;
+		}
+		else{
+			printf("+++ File reading successfully! Readed string: \n");
+			printf("%s \n", readed_data);
+			printf("--- Readed bytes number = %d \n" , BytesReaded );
+			f_close(&file);
+		}
+	}	
+	
+	return res;
+}
+
+
+
+
+FRESULT SD_CardCreateFile(void){
+	FIL file;
+	const char fname[12] = "crt_test.txt";
+    FRESULT res = f_open(&file, fname, FA_CREATE_ALWAYS|FA_READ|FA_WRITE);
+	if (res != FR_OK) printf("--- Creating file %s FAILED! Error code = %d \n", fname, res);
+	else{
+		printf("++++ file %s was created successfully \n", fname);
+		f_close(&file);
+	}
+	return res;
+}
+
+
+
+
+/*******************************************************************/
+int main(){
+
+	SD_Error SD_ErrorState = SD_OK;	// SD SDIO error status
+	
+	FATFS fs;
+	FRESULT res;
 
 	RCC_Init();
 	APP_GPIO_Init();
@@ -34,22 +110,7 @@ int main()
 	uint8_t chr = 0x21;	// character ASCII-code for '!'
 	
 
-	// Тестовые данные для записи
-    for (uint16_t i = 0; i < BUFFER_SIZE; i++)
-    {
-		uint32_t temp_word = 0;
-		for (uint8_t byte_num = 0; byte_num < 4; byte_num++){
-			temp_word |= ( chr << ( byte_num*8 ) );
-			chr++;
-		}
-		writeBuffer[i] = temp_word;
-		readBuffer[i] = 0;
-    }	
-
-	for (uint16_t i = 0; i < BUFFER_SIZE*4; i++){
-		writeBuffer_bytes[i] = (i + chr);
-	}
-
+	
 	printf("---- System started! ---- \n");
 
 	printf("----- SD-card initialization started! ---- \n");
@@ -66,21 +127,20 @@ int main()
     	// Выбор карты и настройка режима работы
     	SD_SelectDeselect((uint32_t) (SDCardInfo.RCA << 16));
     	SD_SetDeviceMode(SD_POLLING_MODE);
-    	
-		printf("----- SD-card Block %d bytes writing! ---- \n", BUFFER_SIZE*4);
-    	// запись блока данных
-    	//SD_WriteBlockBytes(0x00000000, writeBuffer_bytes, SD_BLOCK_SIZE_BYTES);
-		
-		//disk_write (0, writeBuffer_bytes, 0x00000000, 1);
-		
-		printf("----- SD-card Block %d bytes reading! ---- \n", BUFFER_SIZE*4);
-		// чтение блока данных
-		//SD_ErrorState = SD_ReadBlockBytes(0x00000000, readData_8, SD_BLOCK_SIZE_BYTES);
-		disk_read(0, readData_8, 0x00000000, 1);
 
 		
-		if(SD_ErrorState == SD_OK) usart1_send(readData_8, BUFFER_SIZE*4);
-		else printf("----- SD-card reading error! ----- \n");
+		res = SD_CardMount();
+		if (res == FR_OK){
+			res = SD_CardFileOpen();
+
+			//res = SD_CardCreateFile();
+			
+		}
+		else{
+			printf("---- SD-card mounting failed... \n");
+		}
+
+    	
 	}
 	else{
 		printf("----- SD-card not found!! ---- \n");

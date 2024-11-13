@@ -54,12 +54,13 @@ DRESULT disk_read (
     
 	while(count > 0) {
 		
-		errorstatus = SD_ReadBlockBytes(sector, buff, SD_BLOCK_SIZE_BYTES);
+		errorstatus = SD_ReadBlockBytes( ( sector << 9) , buff, SD_BLOCK_SIZE_BYTES);
         if(errorstatus != SD_OK) {
             return RES_ERROR;
         }
         buff += SD_BLOCK_SIZE_BYTES;
         count--;
+
     }
 
     if(errorstatus != SD_OK) {
@@ -96,7 +97,7 @@ DRESULT disk_write (
 
 
     while(count > 0) {
-		errorstatus = SD_WriteBlockBytes(sector, buff, SD_BLOCK_SIZE_BYTES);
+		errorstatus = SD_WriteBlockBytes( ( sector << 9 ) , buff, SD_BLOCK_SIZE_BYTES);
         if(errorstatus != SD_OK) {
             return RES_ERROR;
         }
