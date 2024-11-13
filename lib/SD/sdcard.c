@@ -820,6 +820,23 @@ SD_Error SD_ReadBlockBytes(uint32_t addr, uint8_t *readbuff_bytes, uint16_t Bloc
 
 
 
+SD_Error SD_ReadMultiBlocksBytes(uint32_t addr, uint8_t *readbuff_bytes, uint16_t BlockSize, uint32_t NumberOfBlocks){
+	uint16_t WordsNumber = BlockSize / 4;
+	uint32_t readbuff[WordsNumber * NumberOfBlocks];
+	SD_Error errorstatus = SD_OK;
+	
+	errorstatus = SD_ReadMultiBlocks(addr, readbuff, BlockSize, NumberOfBlocks);
+	
+	if(errorstatus == SD_OK){
+		ConvertArray_W32_to_B8(readbuff, readbuff_bytes, ( WordsNumber * NumberOfBlocks));
+	}
+
+	return errorstatus;
+
+
+}
+
+
 // TODO: Add conversion from 32-bit word into byte.  First try MSB first (big endian)
 /**
   * @brief  Allows to read one block from a specified address in a card.
@@ -990,6 +1007,9 @@ SD_Error SD_ReadBlock(uint32_t addr, uint32_t *readbuff, uint16_t BlockSize)
 
   return(errorstatus);
 }
+
+
+
 
 /**
   * @brief  Allows to read blocks from a specified address  in a card.

@@ -51,17 +51,18 @@ DRESULT disk_read (
     }
 */
 	SD_Error errorstatus = SD_OK;
-    
-	while(count > 0) {
-		
+    if(count == 1) {
 		errorstatus = SD_ReadBlockBytes( ( sector << 9) , buff, SD_BLOCK_SIZE_BYTES);
-        if(errorstatus != SD_OK) {
-            return RES_ERROR;
-        }
-        buff += SD_BLOCK_SIZE_BYTES;
-        count--;
-
-    }
+    	if(errorstatus != SD_OK) {
+    	    return RES_ERROR;
+    	}
+	}
+	else{
+		errorstatus = SD_ReadMultiBlocksBytes( ( sector << 9) , buff, SD_BLOCK_SIZE_BYTES, count);
+    	if(errorstatus != SD_OK) {
+    	    return RES_ERROR;
+    	}
+	}
 
     if(errorstatus != SD_OK) {
         return RES_ERROR;
