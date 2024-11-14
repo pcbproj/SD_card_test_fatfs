@@ -1218,7 +1218,7 @@ SD_Error SD_ReadMultiBlocks(uint32_t addr, uint32_t *readbuff, uint16_t BlockSiz
 }
 
 
-SD_Error SD_WriteBlockBytes(uint32_t addr, uint8_t *writebuff_bytes, uint16_t BlockSizeBytes){
+SD_Error SD_WriteBlockBytes(uint32_t addr, const uint8_t *writebuff_bytes, uint16_t BlockSizeBytes){
 	SD_Error errorstatus = SD_OK;
 	uint32_t writebuff[BlockSizeBytes / 4];
 

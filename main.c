@@ -15,13 +15,12 @@ uint32_t readBuffer[BUFFER_SIZE];
 uint8_t readData_8[BUFFER_SIZE * 4];
 uint8_t writeBuffer_bytes[BUFFER_SIZE * 4];
 
-
+//FATFS fs;
+//FRESULT res;
+//FIL file;
+//FILINFO file_info;
 
 SD_CardInfo SDCardInfo;
-
-
-
-
 
 
 
@@ -47,22 +46,39 @@ FRESULT SD_CardFileOpen(void){
 	const unsigned char fname[12] = "fstest00.txt";
 	uint8_t readed_data[128];
 	unsigned int BytesReaded = 0;
-
-
-	printf("---- opening TXT-file %s... \n ", fname);
-	
+	FRESULT res;
 	FIL file;
-    FRESULT res = f_open(&file, fname, FA_READ);
+	FILINFO file_info;
+
+	printf("--- Checking for existed file %s on SD-card \n", fname);
+	res = f_stat(fname, &file_info);
+	if (res != FR_OK){
+		printf("--- File %s does not exist on SD-card \n" , fname);
+		return res;
+	}
+	printf("+++ File %s existed on SD-card \n", fname);
+	printf("+++ FOUND file %s \n", file_info.fname);
+	printf("+++ file SIZE = %d bytes \n", (uint32_t)file_info.fsize);
+	//===== till here it's OK
+
+
+	printf("--- opening TXT-file %s... \n", fname);
+
+    res = f_open(&file, fname, FA_READ);
     if(res != FR_OK) {
 		printf("--- Error opening file. ErrorCode res = %d \n", res);
     }
 	else{ 
 		printf("+++ opening file complete sucessfully. ErrorCode res = %d \n", res);
 		
+		
+		
 		printf("--- Starting file reading... \n");
-		res = f_read(&file, readed_data, sizeof(readed_data), &BytesReaded);
+
+		res = f_read(&file, readed_data, sizeof(readed_data), &BytesReaded);	
+
 		if(res != FR_OK){
-			printf("---- reading file FAILED! ErrorCode = %d \n", res);
+			printf("--- reading file FAILED! ErrorCode = %d \n", res); 
 			f_close(&file);
 			return res;
 		}
@@ -83,10 +99,13 @@ FRESULT SD_CardFileOpen(void){
 FRESULT SD_CardCreateFile(void){
 	FIL file;
 	const char fname[12] = "crt_test.txt";
+
+	//======= Error HERE ==============
     FRESULT res = f_open(&file, fname, FA_CREATE_ALWAYS|FA_READ|FA_WRITE);
+
 	if (res != FR_OK) printf("--- Creating file %s FAILED! Error code = %d \n", fname, res);
 	else{
-		printf("++++ file %s was created successfully \n", fname);
+		printf("+++ file %s was created successfully \n", fname);
 		f_close(&file);
 	}
 	return res;
@@ -111,19 +130,19 @@ int main(){
 	
 
 	
-	printf("---- System started! ---- \n");
+	printf("--- System started! ---- \n");
 
-	printf("----- SD-card initialization started! ---- \n");
+	printf("--- SD-card initialization started! ---- \n");
     // Иницилизация карты
 	SD_ErrorState = SD_Init();
 
 	if (SD_ErrorState == SD_OK) {
 	
-		printf("----- SD-card Getting information! ---- \n");
+		printf("--- SD-card Getting information! ---- \n");
     	// Получаем информацию о карте
     	SD_GetCardInfo(&SDCardInfo);
     	
-		printf("----- SD-card Selecting! ---- \n");
+		printf("--- SD-card Selecting! ---- \n");
     	// Выбор карты и настройка режима работы
     	SD_SelectDeselect((uint32_t) (SDCardInfo.RCA << 16));
     	SD_SetDeviceMode(SD_POLLING_MODE);
@@ -137,13 +156,13 @@ int main(){
 			
 		}
 		else{
-			printf("---- SD-card mounting failed... \n");
+			printf("--- SD-card mounting failed... \n");
 		}
 
     	
 	}
 	else{
-		printf("----- SD-card not found!! ---- \n");
+		printf("--- SD-card not found!! ---- \n");
 	}
 
 	
