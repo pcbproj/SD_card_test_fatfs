@@ -57,7 +57,7 @@ DRESULT disk_read (
     	    return RES_ERROR;
     	}
 	}
-	else{
+	else if (count > 1) {
 		errorstatus = SD_ReadMultiBlocksBytes( ( sector << 9) , buff, SD_BLOCK_SIZE_BYTES, count);
     	if(errorstatus != SD_OK) {
     	    return RES_ERROR;
@@ -95,16 +95,18 @@ DRESULT disk_write (
 /*
 
 */
-
-
-    while(count > 0) {
+    //while(count > 0) {
+	if(count == 1) {
 		errorstatus = SD_WriteBlockBytes( ( sector << 9 ) , buff, SD_BLOCK_SIZE_BYTES);
         if(errorstatus != SD_OK) {
             return RES_ERROR;
         }
-
-        buff += SD_BLOCK_SIZE_BYTES; 
-        count--;
+	}
+	else if(count > 1){
+        errorstatus = SD_WriteMultiBlockBytes( ( sector << 9 ) , buff, SD_BLOCK_SIZE_BYTES, count);
+        if(errorstatus != SD_OK) {
+            return RES_ERROR;
+        }
     }
 
     if(errorstatus != SD_OK) {

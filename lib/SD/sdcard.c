@@ -240,7 +240,6 @@ SD_Error SD_Init(void)
   * @retval SD_Error: SD Card Error code.
   */
 
-  //TODO: review and rewrite SD_PowerON() with CMSIS for my MCU STM32F407 HCLK = 168 MHz
 SD_Error SD_PowerON(void)
 {
   SD_Error errorstatus = SD_OK;
@@ -837,7 +836,6 @@ SD_Error SD_ReadMultiBlocksBytes(uint32_t addr, uint8_t *readbuff_bytes, uint16_
 }
 
 
-// TODO: Add conversion from 32-bit word into byte.  First try MSB first (big endian)
 /**
   * @brief  Allows to read one block from a specified address in a card.
   * @param  addr: Address from where data are to be read.
@@ -1231,7 +1229,6 @@ SD_Error SD_WriteBlockBytes(uint32_t addr, const uint8_t *writebuff_bytes, uint1
 }
 
 
-// TODO: Add conversion from 8-bit into 32-bit word. First try MSB first (big endian)
 /**
   * @brief  Allows to write one block starting from a specified address 
   *   in a card.
@@ -1466,6 +1463,27 @@ SD_Error SD_WriteBlock(uint32_t addr, uint32_t *writebuff, uint16_t BlockSize)
 
   return(errorstatus);
 }
+
+
+
+
+
+
+SD_Error SD_WriteMultiBlockBytes(uint32_t addr, const uint8_t *writebuff_bytes, uint16_t BlockSize, uint32_t NumberOfBlocks){
+	SD_Error errorstatus = SD_OK;
+	uint32_t writebuff[ (BlockSize * NumberOfBlocks) / 4 ];
+	
+
+	ConvertArray_B8_to_W32(writebuff_bytes, writebuff, (BlockSize*NumberOfBlocks) );
+
+	errorstatus = SD_WriteMultiBlocks(addr, writebuff, BlockSize, NumberOfBlocks);
+	return errorstatus;
+}
+
+
+
+
+
 
 /**
   * @brief  Allows to write blocks starting from a specified address in 
