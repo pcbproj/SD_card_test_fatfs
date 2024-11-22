@@ -48,6 +48,7 @@ FRESULT SD_CardFileOpen(void){
 	const char file_name[12+4] = "fstest00.txt";
 
 	uint8_t readed_data[128];
+	unsigned int BytesToRead = 8;
 	unsigned int BytesReaded = 0;
 	FRESULT res;
 	FIL file;
@@ -89,7 +90,8 @@ FRESULT SD_CardFileOpen(void){
 		
 		printf("--- Starting file reading... \n");
 
-		res = f_read(&file, readed_data, sizeof(readed_data), &BytesReaded);	
+		//res = f_read(&file, readed_data, sizeof(readed_data), &BytesReaded);	
+		res = f_read(&file, readed_data, BytesToRead, &BytesReaded);	
 
 		if(res != FR_OK){
 			printf("--- reading file FAILED! ErrorCode = %d \n", res);  // return error code = 9 (FR_INVALID_OBJECT)
