@@ -1,0 +1,10 @@
+{FF}--- System started! ---- 
+--- SD-card initialization started! ---- 
+--- SD-card Getting information! ---- 
+--- SD-card Selection! ---- 
++++ f_mount() done!
+--- Checking for existed file fstest00.txt on SD-card 
++++ FOUND file fstest00.txt 
++++ file SIZE = 8 bytes 
+--- opening TXT-file ... 
+--- Error opening file. ErrorCode res = 6 

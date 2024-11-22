@@ -30,10 +30,10 @@ FRESULT SD_CardMount(void){
     res = f_mount(&fs, "/", 1);
     
 	if(res != FR_OK) {
-        printf("---- f_mount() failed, res = %d\r\n", res);
+        printf("--- f_mount() failed, res = %d\r\n", res);
         return FR_INT_ERR;
     }
-    printf("++++ f_mount() done!\r\n");
+    printf("+++ f_mount() done!\r\n");
 	return FR_OK;
 }
 
@@ -43,28 +43,42 @@ FRESULT SD_CardMount(void){
 
 FRESULT SD_CardFileOpen(void){
 	
-	const unsigned char fname[12] = "fstest00.txt";
+	//const char file_name[12] = "fstest00.txt";
+	//const char file_name[12] = "crt0.txt";
+	const char file_name[12+4] = "fstest00.txt";
+
 	uint8_t readed_data[128];
 	unsigned int BytesReaded = 0;
 	FRESULT res;
 	FIL file;
 	FILINFO file_info;
+	DIR dir;
 
-	printf("--- Checking for existed file %s on SD-card \n", fname);
-	res = f_stat(fname, &file_info);
-	if (res != FR_OK){
-		printf("--- File %s does not exist on SD-card \n" , fname);
+	printf("--- Opening Root directory... \n");
+
+    	// ======== f_opendir() return res = FR_OK ==========
+	res = f_opendir(&dir, "/");
+	if(res != FR_OK){
+		printf("--- Opening Root directory FAILED. ErrorCode = %d " , res);
 		return res;
 	}
-	printf("+++ File %s existed on SD-card \n", fname);
-	printf("+++ FOUND file %s \n", file_info.fname);
-	printf("+++ file SIZE = %d bytes \n", (uint32_t)file_info.fsize);
-	//===== till here it's OK
+	
+	// ======= if use f_stat() before f_open(), f_open() return error code 6 (FR_INVALID_NAME)
+	//printf("--- Checking for existed file %s on SD-card \n", file_name);
+	//res = f_stat(file_name, &file_info);
+	//if (res != FR_OK){
+	//	printf("--- File %s does not exist on SD-card \n" , file_name);
+	//	return res;
+	//}
+	//printf("+++ FOUND file %s \n", file_info.fname);
+	//printf("+++ file SIZE = %d bytes \n", (uint32_t)file_info.fsize);
+	////===== till here it's OK
 
 
-	printf("--- opening TXT-file %s... \n", fname);
 
-    res = f_open(&file, fname, FA_READ);
+	printf("--- opening TXT-file %s ... \n", file_name);
+
+    res = f_open(&file, file_name, FA_READ); //TODO:  <<-- f_open() return ErrorCode = 6 (FR_INVALID_NAME).   
     if(res != FR_OK) {
 		printf("--- Error opening file. ErrorCode res = %d \n", res);
     }
@@ -78,7 +92,7 @@ FRESULT SD_CardFileOpen(void){
 		res = f_read(&file, readed_data, sizeof(readed_data), &BytesReaded);	
 
 		if(res != FR_OK){
-			printf("--- reading file FAILED! ErrorCode = %d \n", res); 
+			printf("--- reading file FAILED! ErrorCode = %d \n", res);  // return error code = 9 (FR_INVALID_OBJECT)
 			f_close(&file);
 			return res;
 		}
@@ -98,14 +112,23 @@ FRESULT SD_CardFileOpen(void){
 
 FRESULT SD_CardCreateFile(void){
 	FIL file;
-	const char fname[12] = "crt_test.txt";
+	FRESULT res;
+	DIR dir;
+	const char fl_name[12] = "crt0.txt";
+	
+	// ======== f_opendir() return res = FR_OK ==========
+	res = f_opendir(&dir, "/");
+	if(res != FR_OK){
+		printf("--- Opening Root directory FAILED. ErrorCode = %d " , res);
+		return res;
+	}
 
-	//======= Error HERE ==============
-    FRESULT res = f_open(&file, fname, FA_CREATE_ALWAYS|FA_READ|FA_WRITE);
+	//======= Error HERE: Error Code = FR_INVALID_NAME ==============
+    res = f_open(&file, fl_name, FA_CREATE_ALWAYS|FA_READ|FA_WRITE);
 
-	if (res != FR_OK) printf("--- Creating file %s FAILED! Error code = %d \n", fname, res);
+	if (res != FR_OK) printf("--- Creating file %s FAILED! Error code = %d \n", fl_name, res);
 	else{
-		printf("+++ file %s was created successfully \n", fname);
+		printf("+++ file %s was created successfully \n", fl_name);
 		f_close(&file);
 	}
 	return res;
@@ -142,7 +165,7 @@ int main(){
     	// Получаем информацию о карте
     	SD_GetCardInfo(&SDCardInfo);
     	
-		printf("--- SD-card Selecting! ---- \n");
+		printf("--- SD-card Selection! ---- \n");
     	// Выбор карты и настройка режима работы
     	SD_SelectDeselect((uint32_t) (SDCardInfo.RCA << 16));
     	SD_SetDeviceMode(SD_POLLING_MODE);
@@ -153,6 +176,7 @@ int main(){
 			res = SD_CardFileOpen();
 
 			//res = SD_CardCreateFile();
+			//if (res == FR_OK) res = SD_CardFileOpen();
 			
 		}
 		else{

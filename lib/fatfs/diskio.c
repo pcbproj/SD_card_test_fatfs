@@ -37,6 +37,14 @@ DSTATUS disk_initialize (
 /*-----------------------------------------------------------------------*/
 /* Read Sector(s)                                                        */
 /*-----------------------------------------------------------------------*/
+/**
+  * @brief  Reads Sector(s)
+  * @param  pdrv: Physical drive number (0..)
+  * @param  *buff: Data buffer to store read data
+  * @param  sector: Sector address (LBA)
+  * @param  count: Number of sectors to read (1..128)
+  * @retval DRESULT: Operation result
+  */
 
 DRESULT disk_read (
 	BYTE pdrv,		/* Physical drive nmuber to identify the drive */
@@ -45,11 +53,7 @@ DRESULT disk_read (
 	UINT count		/* Number of sectors to read */
 )
 {	
-	/*
-    if(SDCARD_ReadBegin(sector) < 0) {
-        return RES_ERROR;
-    }
-*/
+	
 	SD_Error errorstatus = SD_OK;
     if(count == 1) {
 		errorstatus = SD_ReadBlockBytes( ( sector << 9) , buff, SD_BLOCK_SIZE_BYTES);
@@ -76,7 +80,14 @@ DRESULT disk_read (
 /*-----------------------------------------------------------------------*/
 /* Write Sector(s)                                                       */
 /*-----------------------------------------------------------------------*/
-
+/**
+  * @brief  Writes Sector(s)
+  * @param  pdrv: Physical drive number (0..)
+  * @param  *buff: Data to be written
+  * @param  sector: Sector address (LBA)
+  * @param  count: Number of sectors to write (1..128)
+  * @retval DRESULT: Operation result
+  */
 DRESULT disk_write (
 	BYTE pdrv,			/* Physical drive nmuber to identify the drive */
 	const BYTE *buff,	/* Data to be written */ // 
@@ -85,17 +96,7 @@ DRESULT disk_write (
 )
 {
 	SD_Error errorstatus = SD_OK;
-	// uint32_t *write_buff = (uint32_t*)buff;
 	
-	/*
-    if(SDCARD_WriteBegin(sector) < 0) {
-        return RES_ERROR;
-    }
-*/
-/*
-
-*/
-    //while(count > 0) {
 	if(count == 1) {
 		errorstatus = SD_WriteBlockBytes( ( sector << 9 ) , buff, SD_BLOCK_SIZE_BYTES);
         if(errorstatus != SD_OK) {
