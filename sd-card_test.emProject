@@ -56,7 +56,9 @@
       gdb_server_port="3333"
       gdb_server_register_access="General and Individual"
       gdb_server_reset_command="reset halt"
-      gdb_server_type="OpenOCD" />
+      gdb_server_type="OpenOCD"
+      linker_printf_wchar_enabled="Yes"
+      linker_printf_width_precision_supported="Yes" />
     <folder Name="CMSIS Files">
       <file file_name="STM32F4xx/Device/Include/stm32f4xx.h" />
       <file file_name="STM32F4xx/Device/Source/system_stm32f4xx.c">

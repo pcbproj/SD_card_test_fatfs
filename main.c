@@ -65,33 +65,27 @@ FRESULT SD_CardFileOpen(void){
 	}
 	
 	// ======= if use f_stat() before f_open(), f_open() return error code 6 (FR_INVALID_NAME)
-	//printf("--- Checking for existed file %s on SD-card \n", file_name);
-	//res = f_stat(file_name, &file_info);
-	//if (res != FR_OK){
-	//	printf("--- File %s does not exist on SD-card \n" , file_name);
-	//	return res;
-	//}
-	//printf("+++ FOUND file %s \n", file_info.fname);
-	//printf("+++ file SIZE = %d bytes \n", (uint32_t)file_info.fsize);
-	////===== till here it's OK
+	printf("--- Checking for existed file %s on SD-card \n", file_name);
+	res = f_stat(file_name, &file_info);
+	if (res != FR_OK){
+		printf("--- File %s does not exist on SD-card \n" , file_name);
+		return res;
+	}
+	printf("+++ FOUND file %s \n", file_info.fname);
+	printf("+++ file SIZE = %d bytes \n", (uint32_t)file_info.fsize);
+	printf("--- opening TXT-file %s ... \n", file_info.fname); //NOTE: <<-- here use file_info.fname from f_stat() instead file_name
 
-
-
-	printf("--- opening TXT-file %s ... \n", file_name);
-
-    res = f_open(&file, file_name, FA_READ); //TODO:  <<-- f_open() return ErrorCode = 6 (FR_INVALID_NAME).   
+    res = f_open(&file, file_info.fname, FA_READ);  
     if(res != FR_OK) {
 		printf("--- Error opening file. ErrorCode res = %d \n", res);
     }
 	else{ 
 		printf("+++ opening file complete sucessfully. ErrorCode res = %d \n", res);
 		
-		
-		
 		printf("--- Starting file reading... \n");
 
 		//res = f_read(&file, readed_data, sizeof(readed_data), &BytesReaded);	
-		res = f_read(&file, readed_data, BytesToRead, &BytesReaded);	
+		res = f_read(&file, readed_data, (uint16_t)file_info.fsize, &BytesReaded);	// read whole file data
 
 		if(res != FR_OK){
 			printf("--- reading file FAILED! ErrorCode = %d \n", res);  // return error code = 9 (FR_INVALID_OBJECT)

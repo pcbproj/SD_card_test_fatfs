@@ -144,6 +144,8 @@ static void DMA_RxConfiguration(uint32_t *BufferDST, uint32_t BufferSize);
 /* Private functions ---------------------------------------------------------*/
 
 void ConvertArray_W32_to_B8(uint32_t *array_32, uint8_t *array_8, uint16_t WordsNumber){
+
+	//====== LSB bytes orientation ==========
 	for(uint16_t j = 0; j < WordsNumber; j++){
 		uint32_t word = *(array_32 + j);
 		*(array_8 + (j*4)) = word & 0x000000FF;
@@ -151,6 +153,19 @@ void ConvertArray_W32_to_B8(uint32_t *array_32, uint8_t *array_8, uint16_t Words
 		*(array_8 + (j*4) + 2) = (word & 0x00FF0000) >> 16;
 		*(array_8 + (j*4) + 3) = (word & 0xFF000000) >> 24;
 	}
+
+
+/*
+	//====== MSB bytes orientation (wrong bytes sequence) =======
+	for(uint16_t j = 0; j < WordsNumber; j++){
+		uint32_t word = *(array_32 + j);
+		*(array_8 + (j*4) + 3) = word & 0x000000FF;
+		*(array_8 + (j*4) + 2) = (word & 0x0000FF00) >> 8;
+		*(array_8 + (j*4) + 1) = (word & 0x00FF0000) >> 16;
+		*(array_8 + (j*4)) = (word & 0xFF000000) >> 24;
+	}
+*/
+
 }
 
 
@@ -159,15 +174,15 @@ void ConvertArray_B8_to_W32(uint8_t *array_8, uint32_t *array_32, uint16_t Bytes
 
 	for (uint16_t m = 0; m < WORDS_NUMBER; m++){
 		
-		/* LSB bytes orientation*/
-		/* *(array_32 + m) = (array_8[m*4] << 24) + 
-						(array_8[m*4 + 1] << 16) +
-						(array_8[m*4 + 2] << 8) +
-						(array_8[m*4 + 3]);
+		/* MSB bytes orientation (wrong bytes sequence)*/
+		 //*(array_32 + m) = (array_8[m*4] << 24) + 
+			//			(array_8[m*4 + 1] << 16) +
+			//			(array_8[m*4 + 2] << 8) +
+			//			(array_8[m*4 + 3]);
 		
-		*/
-		/* MSB bytes orientation*/	
-				
+		
+		
+		/* LSB bytes orientation */	
 		*(array_32 + m) = (array_8[m*4]) + 
 						(array_8[m*4 + 1] << 8) +
 						(array_8[m*4 + 2] << 16) +
