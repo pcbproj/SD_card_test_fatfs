@@ -49,24 +49,28 @@ DSTATUS disk_initialize (
 DRESULT disk_read (
 	BYTE pdrv,		/* Physical drive nmuber to identify the drive */
 	BYTE *buff,		/* Data buffer to store read data */
-	DWORD sector,	/* Start sector in LBA */
+	DWORD sector,	/* 512-bytes block number in LBA */
 	UINT count		/* Number of sectors to read */
 )
 {	
 	
 	SD_Error errorstatus = SD_OK;
-    if(count == 1) {
-		errorstatus = SD_ReadBlockBytes( ( sector << 9) , buff, SD_BLOCK_SIZE_BYTES);
+
+	if (count > 1) {
+		errorstatus = SD_ReadMultiBlocksBytes(sector, buff, SD_BLOCK_SIZE_BYTES, count);
     	if(errorstatus != SD_OK) {
     	    return RES_ERROR;
     	}
 	}
-	else if (count > 1) {
-		errorstatus = SD_ReadMultiBlocksBytes( ( sector << 9) , buff, SD_BLOCK_SIZE_BYTES, count);
-    	if(errorstatus != SD_OK) {
-    	    return RES_ERROR;
-    	}
+	else{
+		if(count == 1) {
+			errorstatus = SD_ReadBlockBytes(sector , buff, SD_BLOCK_SIZE_BYTES);
+    		if(errorstatus != SD_OK) {
+    		    return RES_ERROR;
+    		}
+		}
 	}
+
 
     if(errorstatus != SD_OK) {
         return RES_ERROR;
@@ -91,24 +95,25 @@ DRESULT disk_read (
 DRESULT disk_write (
 	BYTE pdrv,			/* Physical drive nmuber to identify the drive */
 	const BYTE *buff,	/* Data to be written */ // 
-	DWORD sector,		/* Start sector in LBA */
+	DWORD sector,		/* 512-bytes block number in LBA */
 	UINT count			/* Number of sectors to write */
 )
 {
 	SD_Error errorstatus = SD_OK;
-	
-	if(count == 1) {
-		errorstatus = SD_WriteBlockBytes( ( sector << 9 ) , buff, SD_BLOCK_SIZE_BYTES);
-        if(errorstatus != SD_OK) {
-            return RES_ERROR;
-        }
-	}
-	else if(count > 1){
-        errorstatus = SD_WriteMultiBlockBytes( ( sector << 9 ) , buff, SD_BLOCK_SIZE_BYTES, count);
+	if(count > 1){
+        errorstatus = SD_WriteMultiBlockBytes(sector, buff, SD_BLOCK_SIZE_BYTES, count);
         if(errorstatus != SD_OK) {
             return RES_ERROR;
         }
     }
+	else{
+		if(count == 1) {
+			errorstatus = SD_WriteBlockBytes(sector, buff, SD_BLOCK_SIZE_BYTES);
+    	    if(errorstatus != SD_OK) {
+    	        return RES_ERROR;
+    	    }
+		}
+	}
 
     if(errorstatus != SD_OK) {
         return RES_ERROR;

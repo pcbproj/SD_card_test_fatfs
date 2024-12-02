@@ -894,7 +894,7 @@ SD_Error SD_ReadBlock(uint32_t addr, uint32_t *readbuff, uint16_t BlockSize)
   if (CardType == SDIO_HIGH_CAPACITY_SD_CARD)
   {
     BlockSize = 512;
-    addr /= 512;
+    //addr /= 512;
   }
   if ((BlockSize > 0) && (BlockSize <= 2048) && ((BlockSize & (BlockSize - 1)) == 0))
   {
@@ -1068,7 +1068,7 @@ SD_Error SD_ReadMultiBlocks(uint32_t addr, uint32_t *readbuff, uint16_t BlockSiz
   if (CardType == SDIO_HIGH_CAPACITY_SD_CARD)
   {
     BlockSize = 512;
-    addr /= 512;
+    //addr /= 512;
   }
   
   if ((BlockSize > 0) && (BlockSize <= 2048) && (0 == (BlockSize & (BlockSize - 1))))
@@ -1289,7 +1289,7 @@ SD_Error SD_WriteBlock(uint32_t addr, uint32_t *writebuff, uint16_t BlockSize)
   if (CardType == SDIO_HIGH_CAPACITY_SD_CARD)
   {
     BlockSize = 512;
-    addr /= 512;
+    //addr /= 512;
   }
   
   /* Set the block size, both on controller and card */
@@ -1546,7 +1546,7 @@ SD_Error SD_WriteMultiBlocks(uint32_t addr, uint32_t *writebuff, uint16_t BlockS
   if (CardType == SDIO_HIGH_CAPACITY_SD_CARD)
   {
     BlockSize = 512;
-    addr /= 512;
+    //addr /= 512;
   }
   
   /* Set the block size, both on controller and card */
@@ -1845,8 +1845,8 @@ SD_Error SD_Erase(uint32_t startaddr, uint32_t endaddr)
 
   if (CardType == SDIO_HIGH_CAPACITY_SD_CARD)
   {
-    startaddr /= 512;
-    endaddr /= 512;
+    //startaddr /= 512;
+    //endaddr /= 512;
   }
   
   /* According to sd-card spec 1.0 ERASE_GROUP_START (CMD32) and erase_group_end(CMD33) */

@@ -55,9 +55,9 @@ FRESULT SD_CardFileOpen(void){
 	FILINFO file_info;
 	DIR dir;
 
-	printf("--- Opening Root directory... \n");
+	//printf("--- Opening Root directory... \n");
 
-    	// ======== f_opendir() return res = FR_OK ==========
+ //   	// ======== f_opendir() return res = FR_OK ==========
 	res = f_opendir(&dir, "/");
 	if(res != FR_OK){
 		printf("--- Opening Root directory FAILED. ErrorCode = %d " , res);
@@ -76,29 +76,29 @@ FRESULT SD_CardFileOpen(void){
 	printf("--- opening TXT-file %s ... \n", file_info.fname); //NOTE: <<-- here use file_info.fname from f_stat() instead file_name
 
     res = f_open(&file, file_info.fname, FA_READ);  
-    if(res != FR_OK) {
-		printf("--- Error opening file. ErrorCode res = %d \n", res);
-    }
-	else{ 
+    
+	if(res == FR_OK){ 
 		printf("+++ opening file complete sucessfully. ErrorCode res = %d \n", res);
 		
 		printf("--- Starting file reading... \n");
 
 		//res = f_read(&file, readed_data, sizeof(readed_data), &BytesReaded);	
 		res = f_read(&file, readed_data, (uint16_t)file_info.fsize, &BytesReaded);	// read whole file data
-
-		if(res != FR_OK){
-			printf("--- reading file FAILED! ErrorCode = %d \n", res);  // return error code = 9 (FR_INVALID_OBJECT)
-			f_close(&file);
-			return res;
-		}
-		else{
+		if(res == FR_OK){
 			printf("+++ File reading successfully! Readed string: \n");
 			printf("%s \n", readed_data);
 			printf("--- Readed bytes number = %d \n" , BytesReaded );
 			f_close(&file);
 		}
+		else{
+			printf("--- reading file FAILED! ErrorCode = %d \n", res);  // return error code = 9 (FR_INVALID_OBJECT)
+			f_close(&file);
+			return res;
+		}
 	}	
+	else{
+		printf("--- Error opening file. ErrorCode res = %d \n", res);
+    }
 	
 	return res;
 }
@@ -150,6 +150,8 @@ int main(){
 
 	
 	printf("--- System started! ---- \n");
+	
+	GPIOE->ODR |= (1<<13)|(1<<14)|(1<<15);  
 
 	printf("--- SD-card initialization started! ---- \n");
     // Иницилизация карты
