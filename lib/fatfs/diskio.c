@@ -1,4 +1,14 @@
-#include "diskio.h"		/* FatFs lower layer API */
+/*-----------------------------------------------------------------------*/
+/* Low level disk I/O module SKELETON for FatFs     (C)ChaN, 2019        */
+/*-----------------------------------------------------------------------*/
+/* If a working storage control module is available, it should be        */
+/* attached to the FatFs via a glue function rather than modifying it.   */
+/* This is an example of glue functions to attach various exsisting      */
+/* storage control modules to the FatFs module with a defined API.       */
+/*-----------------------------------------------------------------------*/
+
+//#include "ff.h"			/* Obtains integer types */
+#include "diskio.h"		/* Declarations of disk functions */
 #include "sdcard.h"
 
 /* Definitions of physical drive number for each drive */
@@ -15,6 +25,33 @@ DSTATUS disk_status (
 	BYTE pdrv		/* Physical drive nmuber to identify the drive */
 )
 {
+	//DSTATUS stat;
+	//int result;
+
+	//switch (pdrv) {
+	//case DEV_RAM :
+	//	result = RAM_disk_status();
+
+	//	// translate the reslut code here
+
+	//	return stat;
+
+	//case DEV_MMC :
+	//	result = MMC_disk_status();
+
+	//	// translate the reslut code here
+
+	//	return stat;
+
+	//case DEV_USB :
+	//	result = USB_disk_status();
+
+	//	// translate the reslut code here
+
+	//	return stat;
+	//}
+	//return STA_NOINIT;
+	
 	return 0;
 }
 
@@ -28,8 +65,34 @@ DSTATUS disk_initialize (
 	BYTE pdrv				/* Physical drive nmuber to identify the drive */
 )
 {
-	// already initialized in init() procedure
-    return 0;
+//	DSTATUS stat;
+//	int result;
+
+//	switch (pdrv) {
+//	case DEV_RAM :
+//		result = RAM_disk_initialize();
+
+//		// translate the reslut code here
+
+//		return stat;
+
+//	case DEV_MMC :
+//		result = MMC_disk_initialize();
+
+//		// translate the reslut code here
+
+//		return stat;
+
+//	case DEV_USB :
+//		result = USB_disk_initialize();
+
+//		// translate the reslut code here
+
+//		return stat;
+//	}
+//	return STA_NOINIT;
+
+	return 0;
 }
 
 
@@ -37,14 +100,6 @@ DSTATUS disk_initialize (
 /*-----------------------------------------------------------------------*/
 /* Read Sector(s)                                                        */
 /*-----------------------------------------------------------------------*/
-/**
-  * @brief  Reads Sector(s)
-  * @param  pdrv: Physical drive number (0..)
-  * @param  *buff: Data buffer to store read data
-  * @param  sector: Sector address (LBA)
-  * @param  count: Number of sectors to read (1..128)
-  * @retval DRESULT: Operation result
-  */
 
 DRESULT disk_read (
 	BYTE pdrv,		/* Physical drive nmuber to identify the drive */
@@ -53,7 +108,7 @@ DRESULT disk_read (
 	UINT count		/* Number of sectors to read */
 )
 {	
-	
+	// check values here: sector, buff, count passed here/ Fnd how they used inside SD_ReadBlockBytes() 
 	SD_Error errorstatus = SD_OK;
 
 	if (count > 1) {
@@ -81,17 +136,56 @@ DRESULT disk_read (
 
 
 
+// DRESULT disk_read (
+	// BYTE pdrv,		/* Physical drive nmuber to identify the drive */
+	// BYTE *buff,		/* Data buffer to store read data */
+	// LBA_t sector,	/* Start sector in LBA */
+	// UINT count		/* Number of sectors to read */
+// )
+// {
+	// DRESULT res;
+	// int result;
+
+	// switch (pdrv) {
+	// case DEV_RAM :
+		// // translate the arguments here
+
+		// result = RAM_disk_read(buff, sector, count);
+
+		// //translate the reslut code here
+
+		// return res;
+
+	// case DEV_MMC :
+		//// translate the arguments here
+
+		// result = MMC_disk_read(buff, sector, count);
+
+		// //translate the reslut code here
+
+		// return res;
+
+	// case DEV_USB :
+		// //translate the arguments here
+
+		// result = USB_disk_read(buff, sector, count);
+
+		// //translate the reslut code here
+
+		// return res;
+	// }
+
+	// return RES_PARERR;
+// }
+
+
+
 /*-----------------------------------------------------------------------*/
 /* Write Sector(s)                                                       */
 /*-----------------------------------------------------------------------*/
-/**
-  * @brief  Writes Sector(s)
-  * @param  pdrv: Physical drive number (0..)
-  * @param  *buff: Data to be written
-  * @param  sector: Sector address (LBA)
-  * @param  count: Number of sectors to write (1..128)
-  * @retval DRESULT: Operation result
-  */
+
+#if FF_FS_READONLY == 0
+
 DRESULT disk_write (
 	BYTE pdrv,			/* Physical drive nmuber to identify the drive */
 	const BYTE *buff,	/* Data to be written */ // 
@@ -122,6 +216,52 @@ DRESULT disk_write (
     return RES_OK;
 }
 
+
+// DRESULT disk_write (
+	// BYTE pdrv,			/* Physical drive nmuber to identify the drive */
+	// const BYTE *buff,	/* Data to be written */
+	// LBA_t sector,		/* Start sector in LBA */
+	// UINT count			/* Number of sectors to write */
+// )
+// {
+	// DRESULT res;
+	// int result;
+
+	// switch (pdrv) {
+	// case DEV_RAM :
+		// //translate the arguments here
+
+		// result = RAM_disk_write(buff, sector, count);
+
+		// //translate the reslut code here
+
+		// return res;
+
+	// case DEV_MMC :
+		// //translate the arguments here
+
+		// result = MMC_disk_write(buff, sector, count);
+
+		// //translate the reslut code here
+
+		// return res;
+
+	// case DEV_USB :
+		// //translate the arguments here
+
+		// result = USB_disk_write(buff, sector, count);
+
+		// //translate the reslut code here
+
+		// return res;
+	// }
+
+	// return RES_PARERR;
+// }
+
+#endif
+
+
 /*-----------------------------------------------------------------------*/
 /* Miscellaneous Functions                                               */
 /*-----------------------------------------------------------------------*/
@@ -132,23 +272,29 @@ DRESULT disk_ioctl (
 	void *buff		/* Buffer to send/receive control data */
 )
 {
-	if(cmd == CTRL_SYNC) {
-		return RES_OK;
-	} else {
-		// should never be called
-		return RES_ERROR;
+	DRESULT res;
+	int result;
+
+	switch (pdrv) {
+	case DEV_RAM :
+
+		// Process of the command for the RAM drive
+
+		return res;
+
+	case DEV_MMC :
+
+		// Process of the command for the MMC/SD card
+
+		return res;
+
+	case DEV_USB :
+
+		// Process of the command the USB drive
+
+		return res;
 	}
+
+	return RES_PARERR;
 }
 
-/**
-  * @brief  Gets Time from RTC 
-  * @param  None
-  * @retval Time in DWORD
-  */
-
-/*
-DWORD get_fattime(void)
-{
-  return 0;
-}
-*/
