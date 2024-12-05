@@ -821,13 +821,10 @@ SD_Error SD_SelectDeselect(uint32_t addr)
 SD_Error SD_ReadBlockBytes(uint32_t addr, uint8_t *readbuff_bytes, uint16_t BlockSizeBytes){
 	
 	uint16_t WordsNumber = BlockSizeBytes / 4;
-	uint32_t readbuff[WordsNumber];
+	uint32_t *readbuff = readbuff_bytes;
 	SD_Error errorstatus = SD_OK;
 
 	errorstatus = SD_ReadBlock(addr, readbuff, BlockSizeBytes);
-	if(errorstatus == SD_OK){
-		ConvertArray_W32_to_B8(readbuff, readbuff_bytes, WordsNumber);
-	}
 
 	return errorstatus;
 }
@@ -836,14 +833,10 @@ SD_Error SD_ReadBlockBytes(uint32_t addr, uint8_t *readbuff_bytes, uint16_t Bloc
 
 SD_Error SD_ReadMultiBlocksBytes(uint32_t addr, uint8_t *readbuff_bytes, uint16_t BlockSize, uint32_t NumberOfBlocks){
 	uint16_t WordsNumber = BlockSize / 4;
-	uint32_t readbuff[WordsNumber * NumberOfBlocks];
+	uint32_t *readbuff = readbuff_bytes; 
 	SD_Error errorstatus = SD_OK;
 	
 	errorstatus = SD_ReadMultiBlocks(addr, readbuff, BlockSize, NumberOfBlocks);
-	
-	if(errorstatus == SD_OK){
-		ConvertArray_W32_to_B8(readbuff, readbuff_bytes, ( WordsNumber * NumberOfBlocks));
-	}
 
 	return errorstatus;
 

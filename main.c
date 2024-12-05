@@ -4,7 +4,7 @@
 
 
 /*******************************************************************/
-#define BUFFER_SIZE		(uint16_t)64 // ascii table in 32-bit words length
+#define BUFFER_SIZE		(uint16_t)512	// read write one sector size in bytes 
 
 
 
@@ -12,21 +12,24 @@
 uint32_t writeBuffer[BUFFER_SIZE]; 
 uint32_t readBuffer[BUFFER_SIZE];
 
-uint8_t readData_8[BUFFER_SIZE * 4];
-uint8_t writeBuffer_bytes[BUFFER_SIZE * 4];
+//uint8_t readData_8[BUFFER_SIZE * 4];
+uint8_t readData_8[BUFFER_SIZE * 200];
 
-//FATFS fs;
-//FRESULT res;
-//FIL file;
-//FILINFO file_info;
+uint8_t writeBuffer_bytes[BUFFER_SIZE];
+
+FATFS fs;
+FRESULT res;
+FIL file;
+FILINFO file_info;
+DIR dir;
 
 SD_CardInfo SDCardInfo;
 
 
 
 FRESULT SD_CardMount(void){
-	FRESULT res;
-	FATFS fs;
+	//FRESULT res;
+	//FATFS fs;
     res = f_mount(&fs, "/", 1);
     
 	if(res != FR_OK) {
@@ -41,19 +44,17 @@ FRESULT SD_CardMount(void){
 
 
 
-FRESULT SD_CardFileOpen(void){
+FRESULT SD_CardFileRead(void){
 	
-	//const char file_name[12] = "fstest00.txt";
-	//const char file_name[12] = "crt0.txt";
 	const char file_name[12+4] = "fstest00.txt";
 
 	uint8_t readed_data[128];
 	unsigned int BytesToRead = 8;
 	unsigned int BytesReaded = 0;
-	FRESULT res;
-	FIL file;
-	FILINFO file_info;
-	DIR dir;
+	//FRESULT res;
+	//FIL file;
+	//FILINFO file_info;
+	//DIR dir;
 
 	//printf("--- Opening Root directory... \n");
 
@@ -83,10 +84,12 @@ FRESULT SD_CardFileOpen(void){
 		printf("--- Starting file reading... \n");
 
 		//res = f_read(&file, readed_data, sizeof(readed_data), &BytesReaded);	
-		res = f_read(&file, readed_data, (uint16_t)file_info.fsize, &BytesReaded);	// read whole file data
+		//res = f_read(&file, readed_data, (uint16_t)file_info.fsize, &BytesReaded);	// read whole file data
+		res = f_read(&file, readData_8, (uint16_t)file_info.fsize, &BytesReaded);	// read whole file data
 		if(res == FR_OK){
 			printf("+++ File reading successfully! Readed string: \n");
-			printf("%s \n", readed_data);
+			//printf("%s \n", readed_data);
+			usart1_send(readData_8, BytesReaded);
 			printf("--- Readed bytes number = %d \n" , BytesReaded );
 			f_close(&file);
 		}
@@ -107,9 +110,9 @@ FRESULT SD_CardFileOpen(void){
 
 
 FRESULT SD_CardCreateFile(void){
-	FIL file;
-	FRESULT res;
-	DIR dir;
+	//FIL file;
+	//FRESULT res;
+	//DIR dir;
 	const char fl_name[12] = "crt0.txt";
 	
 	// ======== f_opendir() return res = FR_OK ==========
@@ -133,13 +136,15 @@ FRESULT SD_CardCreateFile(void){
 
 
 
+
+
 /*******************************************************************/
 int main(){
 
 	SD_Error SD_ErrorState = SD_OK;	// SD SDIO error status
 	
-	FATFS fs;
-	FRESULT res;
+	//FATFS fs;
+	//FRESULT res;
 
 	RCC_Init();
 	APP_GPIO_Init();
@@ -171,7 +176,7 @@ int main(){
 		
 		res = SD_CardMount();
 		if (res == FR_OK){
-			res = SD_CardFileOpen();
+			res = SD_CardFileRead();
 
 			//res = SD_CardCreateFile();
 			//if (res == FR_OK) res = SD_CardFileOpen();

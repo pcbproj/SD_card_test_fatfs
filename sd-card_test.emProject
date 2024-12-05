@@ -47,8 +47,11 @@
       target_reset_script="Reset();" />
     <configuration
       Name="Debug"
+      arm_library_optimization="Balanced"
+      arm_linker_variant="SEGGER"
       c_user_include_directories=".;$(ProjectDir)/lib/inc/;$(ProjectDir)/lib/SD/;$(ProjectDir)/lib/STM32F4XX_SPL/inc/;$(ProjectDir)/lib/fatfs/"
       debug_target_connection="GDB Server"
+      gcc_optimization_level="None"
       gdb_server_allow_memory_access_during_execution="Yes"
       gdb_server_autostart_server="No"
       gdb_server_command_line=""
@@ -77,9 +80,6 @@
         <file file_name="lib/fatfs/ffconf.h" />
         <file file_name="lib/fatfs/ffsystem.c" />
         <file file_name="lib/fatfs/ffunicode.c" />
-        <file file_name="lib/fatfs/integer.h">
-          <configuration Name="Debug" build_exclude_from_build="Yes" />
-        </file>
       </folder>
       <folder Name="inc">
         <file file_name="lib/inc/delay.h" />
