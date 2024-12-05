@@ -12,8 +12,9 @@
 uint32_t writeBuffer[BUFFER_SIZE]; 
 uint32_t readBuffer[BUFFER_SIZE];
 
-//uint8_t readData_8[BUFFER_SIZE * 4];
-uint8_t readData_8[BUFFER_SIZE * 200];
+
+//uint8_t readData_8[BUFFER_SIZE * 200];
+uint8_t readData_8[BUFFER_SIZE];
 
 uint8_t writeBuffer_bytes[BUFFER_SIZE];
 
@@ -83,9 +84,7 @@ FRESULT SD_CardFileRead(void){
 		
 		printf("--- Starting file reading... \n");
 
-		//res = f_read(&file, readed_data, sizeof(readed_data), &BytesReaded);	
-		//res = f_read(&file, readed_data, (uint16_t)file_info.fsize, &BytesReaded);	// read whole file data
-		res = f_read(&file, readData_8, (uint16_t)file_info.fsize, &BytesReaded);	// read whole file data
+		res = f_read(&file, readData_8, (uint16_t)file_info.fsize, &BytesReaded);	// read whole file data. file must be less than array readData_8[] 
 		if(res == FR_OK){
 			printf("+++ File reading successfully! Readed string: \n");
 			//printf("%s \n", readed_data);
