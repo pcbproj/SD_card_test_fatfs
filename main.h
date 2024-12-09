@@ -2,7 +2,9 @@
 #include "sdcard.h"
 #include "usart.h"
 #include "gpio.h"
-#include <stdio.h>
+#include <stdio.h>	// for sprintf()
+#include <stdlib.h> // for malloc()
+#include<string.h>  // for strlen()
 #include "ff.h"
 #include "ffconf.h"
 #include "diskio.h"

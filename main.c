@@ -13,7 +13,6 @@ uint32_t writeBuffer[BUFFER_SIZE];
 uint32_t readBuffer[BUFFER_SIZE];
 
 
-//uint8_t readData_8[BUFFER_SIZE * 200];
 uint8_t readData_8[BUFFER_SIZE];
 
 uint8_t writeBuffer_bytes[BUFFER_SIZE];
@@ -29,8 +28,6 @@ SD_CardInfo SDCardInfo;
 
 
 FRESULT SD_CardMount(void){
-	//FRESULT res;
-	//FATFS fs;
     res = f_mount(&fs, "/", 1);
     
 	if(res != FR_OK) {
@@ -47,26 +44,18 @@ FRESULT SD_CardMount(void){
 
 FRESULT SD_CardFileRead(void){
 	
-	const char file_name[12+4] = "fstest00.txt";
+	const char file_name[12] = "fstest00.txt"; 
 
 	uint8_t readed_data[128];
 	unsigned int BytesToRead = 8;
 	unsigned int BytesReaded = 0;
-	//FRESULT res;
-	//FIL file;
-	//FILINFO file_info;
-	//DIR dir;
-
-	//printf("--- Opening Root directory... \n");
-
- //   	// ======== f_opendir() return res = FR_OK ==========
+ 
 	res = f_opendir(&dir, "/");
 	if(res != FR_OK){
 		printf("--- Opening Root directory FAILED. ErrorCode = %d " , res);
 		return res;
 	}
 	
-	// ======= if use f_stat() before f_open(), f_open() return error code 6 (FR_INVALID_NAME)
 	printf("--- Checking for existed file %s on SD-card \n", file_name);
 	res = f_stat(file_name, &file_info);
 	if (res != FR_OK){
@@ -87,7 +76,6 @@ FRESULT SD_CardFileRead(void){
 		res = f_read(&file, readData_8, (uint16_t)file_info.fsize, &BytesReaded);	// read whole file data. file must be less than array readData_8[] 
 		if(res == FR_OK){
 			printf("+++ File reading successfully! Readed string: \n");
-			//printf("%s \n", readed_data);
 			usart1_send(readData_8, BytesReaded);
 			printf("--- Readed bytes number = %d \n" , BytesReaded );
 			f_close(&file);
@@ -109,24 +97,22 @@ FRESULT SD_CardFileRead(void){
 
 
 FRESULT SD_CardCreateFile(void){
-	//FIL file;
-	//FRESULT res;
-	//DIR dir;
 	const char fl_name[12] = "crt0.txt";
+	uint16_t WritedBytes = 0;
 	
-	// ======== f_opendir() return res = FR_OK ==========
-	res = f_opendir(&dir, "/");
-	if(res != FR_OK){
-		printf("--- Opening Root directory FAILED. ErrorCode = %d " , res);
-		return res;
-	}
-
-	//======= Error HERE: Error Code = FR_INVALID_NAME ==============
     res = f_open(&file, fl_name, FA_CREATE_ALWAYS|FA_READ|FA_WRITE);
 
 	if (res != FR_OK) printf("--- Creating file %s FAILED! Error code = %d \n", fl_name, res);
 	else{
 		printf("+++ file %s was created successfully \n", fl_name);
+		printf("+++ Writing test string into file %s ... \n", fl_name);
+
+		uint8_t *file_text =  malloc(128 * sizeof(uint8_t));	// reserve memory for string file_text
+		sprintf(file_text, "Test string for file creation!!! \n");	// write test string into string file_text
+		res = f_write(&file, file_text, strlen(file_text), &WritedBytes); // write string file_text into file
+
+		if (res != FR_OK) printf("--- Writing into file %s FAILED! Error code = %d \n", fl_name, res);
+		else printf("+++ Writing string into file %s successfully \n", fl_name);
 		f_close(&file);
 	}
 	return res;
@@ -142,15 +128,9 @@ int main(){
 
 	SD_Error SD_ErrorState = SD_OK;	// SD SDIO error status
 	
-	//FATFS fs;
-	//FRESULT res;
-
 	RCC_Init();
 	APP_GPIO_Init();
 	USART1_Init();		// for debug baudrate = 115200
-
-	uint8_t chr = 0x21;	// character ASCII-code for '!'
-	
 
 	
 	printf("--- System started! ---- \n");
@@ -177,8 +157,7 @@ int main(){
 		if (res == FR_OK){
 			res = SD_CardFileRead();
 
-			//res = SD_CardCreateFile();
-			//if (res == FR_OK) res = SD_CardFileOpen();
+			res = SD_CardCreateFile();
 			
 		}
 		else{
