@@ -28,7 +28,7 @@ SD_CardInfo SDCardInfo;
 
 
 FRESULT SD_CardMount(void){
-    res = f_mount(&fs, "/", 1);
+    res = f_mount(&fs, "/", 1);	// примонтировать раздел немедленно 
     
 	if(res != FR_OK) {
         printf("--- f_mount() failed, res = %d\r\n", res);
@@ -73,7 +73,8 @@ FRESULT SD_CardFileRead(void){
 		
 		printf("--- Starting file reading... \n");
 
-		res = f_read(&file, readData_8, (uint16_t)file_info.fsize, &BytesReaded);	// read whole file data. file must be less than array readData_8[] 
+		//res = f_read(&file, readData_8, (uint16_t)file_info.fsize, &BytesReaded);	// read whole file data. file must be less than array readData_8[] 
+		res = f_read(&file, readData_8, (uint16_t)BUFFER_SIZE, &BytesReaded);	// read whole file data. file must be less than array readData_8[] 
 		if(res == FR_OK){
 			printf("+++ File reading successfully! Readed string: \n");
 			usart1_send(readData_8, BytesReaded);
